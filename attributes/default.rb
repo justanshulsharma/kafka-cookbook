@@ -28,6 +28,10 @@ default['kafka-cluster']['config']['properties']['kafka.metrics.reporters'] = 'k
 default['kafka-cluster']['config']['properties']['kafka.csv.metrics.dir'] = '/tmp/kafka_metrics'
 default['kafka-cluster']['config']['properties']['kafka.csv.metrics.reporter.enabled'] = false
 default['kafka-cluster']['config']['properties']['replica.lag.max.messages'] = 10_000_000
+default['kafka-cluster']['config']['properties']['broker.id'] = node['ipaddress'].rpartition('.').last
+nodes = []
+search(:node, "name:*").each { |node| nodes << node.attributes.private_ip }
+default['kafka-cluster']['config']['properties']['zookeeper.connect'] = nodes.map { |m| "#{m}:2181"}.join(',').concat('/kafka')
 
 default['kafka-cluster']['service']['version'] = '0.8.2.1'
 default['kafka-cluster']['service']['environment']['KAFKA_HEAP_OPTS'] = '-Xmx1G -Xms1G'
